@@ -1,3 +1,5 @@
+import joblib
+
 def saveVariable(results_path, dataset, filename, variable, compression_parameter = 9, verbose = False):
     import os.path
     
