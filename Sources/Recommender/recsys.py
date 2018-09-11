@@ -1,5 +1,20 @@
+import sys
+import os
 import numpy as np
 import pandas as pd
+devooght_package = './../Devooght/'
+#if devooght_package not in sys.path:
+#    sys.path.append(devooght_package)
+import Devooght.preprocess as preprocess
+reload(preprocess)
+import Devooght.train as train
+reload(train)
+import Devooght.train as train
+reload(train)
+import helpers.command_parser as parse
+reload(parse)
+from helpers import data_handling as handler
+reload(handler)
 
 class recommender:
     def __init__(self, algorithm):
@@ -7,6 +22,7 @@ class recommender:
         # Always call base method before doing anything.
         self.name = algorithm.lower() # SVD, NMF, SAE, LSTM
         self.surprise_algorithms = ['svd', 'nmf', 'knnbasic', 'knnmeans']
+        self.devooght_algorithms = ['fism']
         
         '''
          To implement with surprise:
@@ -40,6 +56,7 @@ class recommender:
         self.unknown_sequence_dict = None
         self.k = None
         self.k_min = None
+        self.metrics = None
         
     def get_name(self, verbose = False):
         return self.name
@@ -83,7 +100,6 @@ class recommender:
 
             # Creting trainset variable to be used in prediction functions of Surprise
             self.trainset = data.build_full_trainset()
-
             
             # Creating Model
             if self.name == 'svd':                
@@ -176,10 +192,96 @@ class recommender:
             else:
                 if (verbose):
                     print ("Algorithm not configured: {}".format(self.name))
-                return 0
+                return -1
 
             # Train the algorithm on the trainset, and predict ratings for the testset
             self.model.train(self.trainset)
+            
+            return 0
+            
+        elif (self.name in self.devooght_algorithms):
+            
+            # Arguments
+            directory_path = os.path.join('.', 'Sequence_based_recommendation_files', self.name)
+            preprocess.create_dirs(dirname=directory_path, verbose = verbose)
+
+            data = preprocess.remove_rare_elements(
+                            data = df_ratings, 
+                            min_user_activity = 1, 
+                            min_item_popularity = 1,
+                            verbose = verbose)
+            
+            data = preprocess.save_index_mapping(data = data, 
+                                     dirname = directory_path, 
+                                     separator = ',')
+            
+            train_set, val_set, test_set = preprocess.split_data(
+                data = data, 
+                nb_val_users = 0.1, # val_size
+                nb_test_users = 0.1, # test_size
+                dirname = directory_path,
+                verbose = verbose)
+            
+            preprocess.make_sequence_format(
+                train_set = train_set, 
+                val_set = val_set, 
+                test_set = test_set, 
+                dirname = directory_path,
+                verbose = verbose)
+            
+            preprocess.save_data_stats(
+                data = data, 
+                train_set = train_set, 
+                val_set = val_set, 
+                test_set = test_set, 
+                dirname = directory_path,
+                verbose = verbose)
+            
+            # Training Algorithm            
+            parser = parse.command_parser(parse.predictor_command_parser, 
+                                        train.training_command_parser, 
+                                        parse.early_stopping_command_parser
+            )
+            
+            
+            if self.name == 'fism':
+                args = parser.parse_args(['--dir', os.path.join(directory_path, 'models'),
+                          '-d', directory_path, #directory_path + '/', 
+                          '-b', '20', # Batch size: the number of training examples present in a single blatch
+                          '--max_iter', '50', # Maximum number of iterations: the number of batches needed to complete one epoch
+                          '--progress', '10', # when progress information should be printed during training
+                          '-m', self.name.upper(), # Method
+                          #'-i', '-1', # Number of batches - only on test parser
+                         '--loss', 'RMSE',
+                         '--save', 'Best']) 
+                
+                self.model = parse.get_predictor(args)
+                                
+                dataset = handler.DataHandler(dirname = args.dataset, 
+                                      extended_training_set = args.extended_set, 
+                                      shuffle_training = args.tshuffle)
+                
+                self.model.prepare_model(dataset)
+                self.metrics = self.model.train(dataset, 
+                        save_dir = args.dir, 
+                        time_based_progress = args.time_based_progress, 
+                        progress = float(args.progress), 
+                        autosave = args.save, 
+                        max_progress_interval = args.mpi, 
+                        max_iter = args.max_iter,
+                        min_iterations = args.min_iter,
+                        max_time = args.max_time,
+                        early_stopping = parse.get_early_stopper(args),
+                        load_last_model = args.load_last_model,
+                        validation_metrics = args.metrics.split(','))
+            
+            else:
+                if (verbose):
+                    print ("Algorithm not configured: {}".format(self.name))
+                return -1
+            
+            return 0
+            
         else: # if self.name not in self.surprise_algorithms
             if (verbose): 
                 print ("Invalid algorithm: {}".format(self.name))
@@ -187,6 +289,9 @@ class recommender:
     def get_model(self):
         return self.model
             
+    def get_metrics(self):
+        return self.metrics
+    
     def calculate_known_predictions(self):
         # Calculating all predictions for known items
         
