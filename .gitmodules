@@ -1,0 +1,3 @@
+[submodule "Sources/CaseRecommender"]
+	path = Sources/CaseRecommender
+	url = https://github.com/guedes-joaofelipe/CaseRecommender.git

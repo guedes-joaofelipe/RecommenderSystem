@@ -1,3 +1,11 @@
 /Notebooks/Results/
 /Notebooks/messaging/
 /Notebooks/.ipynb_checkpoints/
+/Notebooks/JFGS.json
+/Datasets/*
+/Sources/datasets/*
+/virtualenvs/*
+.ipynb_checkpoints
+*.pyc
+*.dat
+*.ini
