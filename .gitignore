@@ -9,3 +9,8 @@
 *.pyc
 *.dat
 *.ini
+*.json
+*.joblib
+*.jpeg
+*.csv
+*.txt
