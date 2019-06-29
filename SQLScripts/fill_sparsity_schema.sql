@@ -2,13 +2,15 @@
 
 -- Filling sparsity.cenario
 
+	truncate table sparsity.cenario cascade;
+
 	insert into sparsity.cenario
 	(uss, iss)
     SELECT cast(a.n/100.0 as decimal(10,2)) as uss, T2.iss 
-    FROM generate_series(10, 100, 1) AS a(n)
+    FROM generate_series(10, 100, 2) AS a(n)
     inner join (
     	SELECT b.n, cast(b.n/100.0 as decimal(10,2)) as iss 
-    	FROM generate_series(10, 100, 1) AS b(n)
+    	FROM generate_series(10, 100, 2) AS b(n)
     ) T2 
     	on 1 = 1;
     
@@ -21,10 +23,14 @@ inner join datasets."user" u on uuss.id_user = u.id_user
 where id_dataset = 1   
     
 -- Query para encontrar USS 
+truncate table sparsity.user_uss;
+
+insert into sparsity.user_uss 
+(id_user, n_feedback, max_feedback, uss)
 select T1.id_user, 
 		T1.n_feedback, 
 		max(n_feedback) OVER(PARTITION BY id_dataset, counter) as max_feedback, 
-		T1.n_feedback/cast(max(n_feedback) OVER(PARTITION BY id_dataset, counter) as decimal(10, 2)) as uss
+		1 - T1.n_feedback/cast(max(n_feedback) OVER(PARTITION BY id_dataset, counter) as decimal(10, 2)) as uss
 from (
 	select us.id_dataset, fb.id_user, count(1) as n_feedback, 1 as counter  
 	from datasets.feedback fb 
@@ -35,15 +41,19 @@ from (
 
 	
 -- Query para encontrar ISS 
+truncate table sparsity.item_iss; 
+
+insert into sparsity.item_iss 
+(id_item, n_feedback, max_feedback, iss)
 select T1.id_item, 
 		T1.n_feedback, 
 		max(n_feedback) OVER(PARTITION BY id_dataset, counter) as max_feedback, 
-		T1.n_feedback/cast(max(n_feedback) OVER(PARTITION BY id_dataset, counter) as decimal(10, 2)) as uss
+		1-T1.n_feedback/cast(max(n_feedback) OVER(PARTITION BY id_dataset, counter) as decimal(10, 2)) as iss
 from (
 	select it.id_dataset, fb.id_item, count(1) as n_feedback, 1 as counter  
 	from datasets.feedback fb 
-	inner join datasets.item it on fb.id_item = it.id_item
-	group by it.id_dataset, fb.id_item
+	inner join datasets.item it on fb.id_item = it.id_item	
+	group by it.id_dataset, fb.id_item	
 ) as T1
 
 

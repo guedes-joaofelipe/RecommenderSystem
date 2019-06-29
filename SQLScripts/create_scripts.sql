@@ -11,6 +11,15 @@ CREATE TABLE sparsity.cenario (
 );
 
 -- Table: cenario_items
+CREATE TABLE sparsity.cenario_folder (
+	id_user int not null,
+    id_item int  NOT NULL,
+    id_sparsity_cenario int  NOT NULL,
+    id_dataset int  NOT NULL,
+    id_folder int not null
+);
+
+-- Table: cenario_items
 CREATE TABLE sparsity.cenario_items (
     id_item int  NOT NULL,
     id_sparsity_cenario int  NOT NULL,
@@ -53,7 +62,7 @@ CREATE TABLE datasets.clusters (
 
 -- Table: config
 CREATE TABLE models.config (
-    id_model_configuration int  NOT NULL,
+    id_model_configuration int  NOT null default nextval('models.seq_id_model_configuration'),
     id_model_parameter int  NOT NULL,
     id_model int  NOT NULL,
     CONSTRAINT config_pk PRIMARY KEY (id_model_configuration)
@@ -132,7 +141,7 @@ CREATE TABLE results.metric (
 
 -- Table: model
 CREATE TABLE models.model (
-    id_model int  NOT NULL,
+    id_model int  NOT null DEFAULT nextval('models.seq_id_model'),
     name varchar(100)  NOT NULL,
     "alias" varchar(50)  NOT NULL,
     CONSTRAINT model_pk PRIMARY KEY (id_model)
@@ -148,7 +157,7 @@ CREATE TABLE sparsity.overall_sparsity (
 
 -- Table: parameters
 CREATE TABLE models.parameters (
-    id_model_parameter int  NOT NULL,
+    id_model_parameter int  NOT null default nextval('models.seq_id_model_parameter'),
     id_model int  NOT NULL,
     name varchar(50)  NOT NULL,
     value varchar(50)  NOT NULL,
@@ -247,6 +256,41 @@ ALTER TABLE sparsity.user_uss ADD CONSTRAINT sparsity_user_uss_datasets_user
 ALTER TABLE sparsity.cenario_items_folder ADD CONSTRAINT cenario_items_folder_cenario_items
     FOREIGN KEY (id_item, id_sparsity_cenario, id_dataset)
     REFERENCES sparsity.cenario_items (id_item, id_sparsity_cenario, id_dataset)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+ALTER TABLE sparsity.cenario_folder ADD CONSTRAINT cenario_folder_fk_user
+    FOREIGN KEY (id_user)
+    REFERENCES datasets.user (id_user)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+ALTER TABLE sparsity.cenario_folder ADD CONSTRAINT cenario_folder_fk_item
+    FOREIGN KEY (id_item)
+    REFERENCES datasets.item (id_item)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+ALTER TABLE sparsity.cenario_folder ADD CONSTRAINT cenario_folder_fk_sparsity_cenario
+    FOREIGN KEY (id_sparsity_cenario)
+    REFERENCES sparsity.cenario (id_sparsity_cenario)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+ALTER TABLE sparsity.cenario_folder ADD CONSTRAINT cenario_folder_fk_folder
+    FOREIGN KEY (id_folder)
+    REFERENCES sparsity.folder(id_folder)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+ALTER TABLE sparsity.cenario_folder ADD CONSTRAINT cenario_folder_fk_dataset
+    FOREIGN KEY (id_dataset)
+    REFERENCES datasets.dataset(id_dataset)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -510,6 +554,24 @@ CREATE SEQUENCE datasets.seq_id_user_info_types
 ;
 
 
+-- Sequence: seq_id_model_parameter
+CREATE SEQUENCE models.seq_id_model_parameter
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1
+      NO CYCLE
+;
+
+-- Sequence: seq_id_model_config
+CREATE SEQUENCE models.seq_id_model_configuration
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1
+      NO CYCLE
+;
+
 -- Sequence: seq_id_sparsity_cenario
 CREATE SEQUENCE sparsity.seq_id_sparsity_cenario
       INCREMENT BY 1
@@ -518,6 +580,16 @@ CREATE SEQUENCE sparsity.seq_id_sparsity_cenario
       START WITH 1
       NO CYCLE
 ;
+
+-- Sequence: seq_id_model
+CREATE SEQUENCE models.seq_id_model
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1
+      NO CYCLE
+;
+
 
 CREATE OR REPLACE VIEW sparsity.users_uss AS
 select T1.id_user as id_user, 
