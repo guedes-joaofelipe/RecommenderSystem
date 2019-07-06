@@ -76,6 +76,8 @@ insert into datasets.user_info_types (info_type) values ('location');
 delete from datasets."user"
 where id_dataset in (select id_dataset from datasets.dataset where version = 'BOOKX' group by id_dataset);
 
+delete from datasets.user_info where id_user in (select id_user from datasets."user" where id_dataset = 7)
+
 insert into datasets."user"
 (id_dataset, id_user_dataset)
 select id_dataset, id_user from transistory.bkx_user bk 
@@ -249,17 +251,40 @@ update transistory.bkx_data set rating = substring(rating,'^"(.*)"');
  * */
 insert into datasets.feedback 
 (id_user, id_item, value, id_feedback_type)
-
-
 select count(1) from (
-select us.id_user, it.id_item, rating, ft.id_feedback_type as type  
-from transistory.bkx_data tran 
-inner join datasets."user" us on us.id_user_dataset = tran.id_user and us.id_dataset = 7 
-inner join datasets.item it on it.id_item_dataset = tran.id_item and it.id_dataset = 7
-inner join datasets.feedback_type ft on ft.info_type = 'explicit') T1;
+	select us.id_user, it.id_item, tran."Book-Rating", ft.id_feedback_type  
+	from transistory.bkx_data tran 
+	inner join datasets."user" us on us.id_user_dataset = tran."User-ID" and us.id_dataset = 7 
+	inner join datasets.item it on it.id_item_dataset = tran."ISBN" and it.id_dataset = 7
+	inner join datasets.feedback_type ft on ft.info_type = 'explicit'
+	where it.id_item_dataset != 'null'
+) T1
+ 
+
+; -- 149780
+
+select * from transistory.bkx_data;
+
+/*
+ * Alguns itens não possuem as respectivas informações no arquivo BX-Books, então eles serão inseridos no datasets.items sem nenhuma informação
+ */
+select * from datasets."user" where id_user = 3232319;
+
+select * from datasets.item where id_item_dataset = '0330376799'
+
+select * from transistory.bkx_item where 'ISBN' = '"0330376799"' 
+
+
+
+select * from transistory.bkx_data where id_user = '159630'
 
 select * from datasets.feedback;
 
 drop table if exists transistory.movielens100k_data; 
 drop table if exists transistory.movielens100k_user;
 drop table if exists transistory.movielens100k_item;
+
+
+delete from datasets.user_info where id_user in (select id_user from datasets.user where id_dataset = 7
+
+select count(1) from datasets.feedback fb inner join datasets.item it on fb.id_item = it.id_item where id_dataset = 7

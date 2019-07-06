@@ -32,7 +32,7 @@ def run_notebook(partition, args):
                 n_folds=int(args.n_folds))
         )
     except Exception as e:
-        bot.send_message(text="Error on script for {}-{}[{}/{}]: {}".format(args.dataset_tag, args.model_tag, args.partition, args.nodes, e))
+        bot.send_message(text="Error on script for {}-{}[{}/{}]: {}".format(args.dataset_tag, args.model_tag, partition, args.nodes, e))
         print (e)
 
 if __name__ == '__main__':
@@ -58,4 +58,4 @@ if __name__ == '__main__':
     for process in processes:
         process.join()
 
-    # python papermill_script.py -d=ML1M -n=10 -m=MostPopular -r=30 -p=1 
+    # python papermill_script.py -d=ML1M -n=10 -f=5 -m=MostPopular -r=30 -p=1 
