@@ -1,3 +1,6 @@
 [submodule "Sources/CaseRecommender"]
 	path = Sources/CaseRecommender
 	url = https://github.com/guedes-joaofelipe/CaseRecommender.git
+[submodule "Sources/daisyRec"]
+	path = Sources/daisyRec
+	url = https://github.com/AmazingDD/daisyRec.git
