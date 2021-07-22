@@ -1,0 +1,101 @@
+# General Arguments
+gpu_id: 0
+use_gpu: True
+seed: 2020
+reproducibility: True
+state: INFO
+dataset: 'other'
+data_path: 'rec-sparsity/dataset/sparse'
+show_progress: True
+
+# Training Arguments
+checkpoint_dir: 'saved'
+epochs: 300
+train_batch_size: 2048
+learner: adam
+learning_rate: 0.001
+training_neg_sample_num: 1
+training_neg_sample_distribution: uniform
+eval_step: 1
+stopping_step: 10
+clip_grad_norm: ~
+# clip_grad_norm:  {'max_norm': 5, 'norm_type': 2}
+weight_decay: 0.0
+draw_loss_pic: False
+
+k: 80
+
+# evaluation settings
+# https://recbole.io/docs/user_guide/evaluation_support.html
+eval_setting: RO_RS,full
+group_by_user: True
+split_ratio: [0.8,0.1,0.1] # Train / Validation / Test
+leave_one_num: 2
+real_time_process: False
+metrics: ["Recall","MRR","NDCG","Hit","Precision"] # ['Recall', 'MRR', 'NDCG', 'Hit', 'MAP', 'Precision', 'AUC', 'MAE', 'RMSE', 'LogLoss']
+topk: [10]
+valid_metric: MRR@10
+valid_metric_bigger: True
+eval_batch_size: 4096
+loss_decimal_place: 4
+metric_decimal_place: 4
+
+
+##### Dataset Parameters
+
+# Atomic File Format
+field_separator: "\t"
+seq_separator: " "
+
+# Common Features
+USER_ID_FIELD: user_id
+ITEM_ID_FIELD: item_id
+RATING_FIELD: rating
+TIME_FIELD: timestamp
+seq_len: ~
+
+# Label for Point-wise DataLoader
+LABEL_FIELD: label
+threshold: ~
+
+# NegSample Prefix for Pair-wise DataLoader
+NEG_PREFIX: neg_
+
+# Sequential Model Needed
+ITEM_LIST_LENGTH_FIELD: item_length
+LIST_SUFFIX: _list
+MAX_ITEM_LIST_LENGTH: 50
+POSITION_FIELD: position_id
+
+# Knowledge-based Model Needed
+HEAD_ENTITY_ID_FIELD: head_id
+TAIL_ENTITY_ID_FIELD: tail_id
+RELATION_ID_FIELD: relation_id
+ENTITY_ID_FIELD: entity_id
+
+# Selectively Loading
+load_col:
+    inter: [user_id, item_id, rating, timestamp]
+unload_col: ~
+unused_col: ~
+
+# Filtering
+rm_dup_inter: ~
+lowest_val: ~
+highest_val: ~
+equal_val: ~
+not_equal_val: ~
+filter_inter_by_user_or_item: True
+max_user_inter_num: ~
+min_user_inter_num: ~
+max_item_inter_num: ~
+min_item_inter_num: 10
+max_uss: ~
+max_iss: 5
+
+# Preprocessing
+fields_in_same_space: ~
+preload_weight: ~
+normalize_field: ~
+normalize_all: True
+

@@ -4,3 +4,6 @@
 [submodule "Sources/daisyRec"]
 	path = Sources/daisyRec
 	url = https://github.com/AmazingDD/daisyRec.git
+[submodule "Sources/RecBole"]
+	path = Sources/RecBole
+	url = https://github.com/RUCAIBox/RecBole.git
