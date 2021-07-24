@@ -7,3 +7,6 @@
 [submodule "Sources/RecBole"]
 	path = Sources/RecBole
 	url = https://github.com/RUCAIBox/RecBole.git
+[submodule "Sources/RecDatasets"]
+	path = Sources/RecDatasets
+	url = https://github.com/RUCAIBox/RecDatasets

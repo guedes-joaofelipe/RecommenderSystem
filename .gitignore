@@ -16,5 +16,8 @@
 *.jpeg
 *.csv
 *.txt
+*.inter
+*.user
+*.item
 log/
 saved/
