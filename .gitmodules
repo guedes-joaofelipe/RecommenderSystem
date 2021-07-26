@@ -1,12 +1,12 @@
-[submodule "Sources/CaseRecommender"]
+[submodule "libs/CaseRecommender"]
 	path = Sources/CaseRecommender
 	url = https://github.com/guedes-joaofelipe/CaseRecommender.git
-[submodule "Sources/daisyRec"]
-	path = Sources/daisyRec
+[submodule "libs/daisyRec"]
+	path = libs/daisyRec
 	url = https://github.com/AmazingDD/daisyRec.git
-[submodule "Sources/RecBole"]
-	path = Sources/RecBole
-	url = https://github.com/RUCAIBox/RecBole.git
-[submodule "Sources/RecDatasets"]
-	path = Sources/RecDatasets
-	url = https://github.com/RUCAIBox/RecDatasets
+[submodule "libs/RecBole"]
+	path = libs/RecBole
+	url = https://github.com/guedes-joaofelipe/RecBole.git
+[submodule "libs/RecDatasets"]
+	path = libs/RecDatasets
+	url = https://github.com/guedes-joaofelipe/RecDatasets
